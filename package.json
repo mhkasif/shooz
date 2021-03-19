@@ -6,22 +6,24 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "node app.js",
-    "dev-start": "nodemon server.js"
+    "dev-start": "nodemon server.js",
+    "debug":"ndb server.js"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/mhkasif/shooz.git"
+    "url": "git+https://github.com/mhkasif/shoes.git"
   },
   "author": "mhk",
   "license": "ISC",
   "bugs": {
-    "url": "https://github.com/mhkasif/shooz/issues"
+    "url": "https://github.com/mhkasif/shoes/issues"
   },
-  "homepage": "https://github.com/mhkasif/shooz#readme",
+  "homepage": "https://github.com/mhkasif/shoes#readme",
   "dependencies": {
     "dotenv": "^8.2.0",
     "express": "^4.17.1",
-    "mongoose": "^5.12.0"
+    "mongoose": "^5.12.0",
+    "validator": "^13.5.2"
   },
   "devDependencies": {
     "nodemon": "^2.0.7"
