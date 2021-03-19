@@ -110,4 +110,4 @@ shoesSchema.virtual("onSale").get(function () {
 //   // this.pipeline().unshift({ $match: { vipShoes: { $ne: true } } });
 //   next();
 // });
-exports.Shoes = new mongoose.model("Shoes", shoesSchema);
+exports.Shoes = new mongoose.model("Shoe", shoesSchema);
