@@ -24,13 +24,13 @@ const sendErrorProd = (err, res) => {
   }
 };
 const handleCastErrorDB=(err)=>{
-const message=`Invalid ${err.path}: ${err.value}`
-return new AppError(message,400)
+// const message=`Invalid ${err.path}: ${err.value}`
+// return new AppError(message,400)
 }
 const handleDuplicateKeyDB=(err)=>{
-    const value=err.message.match(/(["'])(\\?.)*?\1/)[0]
-const message=`Duplicate Field Value: ${value}. Pleasde use another value`
-return new AppError(message,400)
+//     // const value=err.message.match(/(["'])(\\?.)*?\1/)[0]
+// const message=`Duplicate Field Value: ${value}. Pleasde use another value`
+// return new AppError(message,400)
 }
 const errorController = (err, req, res, next) => {
   err.statusCode = err.statusCode || 500;
