@@ -41,6 +41,11 @@ const userSchema = mongoose.Schema({
   displayPhoto: {
     type: String,
   },
+  active:{
+    type:Boolean,
+    default:true,
+    select:false
+  },
   passwordChangedAt: Date,
   passwordResetToken: String,
   passwordResetExpires: Date,
@@ -60,6 +65,10 @@ userSchema.pre('save', function (next){
   next()
 }
 )
+userSchema.pre(/^find/, function (next){
+  this.find({active:{$ne:false}})
+}
+)
 userSchema.methods.correctPassword = async function (
   candidatePassword,
   userPassword
@@ -69,6 +78,7 @@ userSchema.methods.correctPassword = async function (
 userSchema.methods.changePasswordAfter = async function (JWTTimestamp) {
   if (this.passwordChangedAt) {
     const changeTimestamp = parseInt(this.passwordChangedAt.getTime() / 1000);
+
     return JWTTimestamp < changeTimestamp;
   }
 
