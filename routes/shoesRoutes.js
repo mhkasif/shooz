@@ -1,4 +1,5 @@
 const express = require("express");
+const { protect } = require("../controller/authController");
 const {
   getAllShoes,
   addShoes,
@@ -11,5 +12,5 @@ const {
 const shoesRouter = express.Router();
 shoesRouter.route("/").get(getAllShoes).post(addShoes);
 shoesRouter.route("/top-rated-shoes").get(aliasTopRatedShoes, getAllShoes);
-shoesRouter.route("/:id").get(getShoes).patch(updateShoes).delete(deleteShoes);
+shoesRouter.route("/:id").get(getShoes).patch(updateShoes).delete(protect,deleteShoes);
 module.exports = shoesRouter;

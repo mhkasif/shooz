@@ -61,13 +61,46 @@ const protect = catchAsync(async (req, res, next) => {
     return next(
       new AppError("The user belonging to this token no longer exist")
     );
-    if(freshUser.changePasswordAfter(decoded.iat)){
-        return next(new AppError('User recently changed password! please login again'))
-    }
-req.user=freshUser
+  if (freshUser.changePasswordAfter(decoded.iat)) {
+    return next(
+      new AppError("User recently changed password! please login again")
+    );
+  }
+  req.user = freshUser;
   next();
+});
+const restrictTo = (...roles) => {
+  return (req, res, next) => {
+    if (!roles.includes(req.user.role))
+      return next(
+        new AppError("You don't have a permission to perform this action", 403)
+      );
+    next();
+  };
+};
+
+const forgotPassword = catchAsync(async (req, res, next) => {
+  const user = await User.findOne({ email: req.body.email });
+  if (!user) {
+    next(new AppError("No user exist with this email", 404));
+  }
+  const resetToken = user.createPasswordResetToken();
+  await user.save({validateBeforeSave:false}); //to save expiry date in usermodel
+});
+const resetPassword = catchAsync(async (req, res, next) => {
+  const user = User.findOne({
+    passowrdResetToken: req.params.token,
+    passworkResetExpires: { $gte: new Date.now() },
+  });
+  if(!user){
+    next()
+  }
 });
 module.exports = {
   signUp,
   login,
+  protect,
+  restrictTo,
+  forgotPassword,
+  resetPassword,
 };
