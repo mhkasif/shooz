@@ -5,6 +5,21 @@ const jwt = require("jsonwebtoken");
 const AppError = require("../utils/appError");
 const { promisify } = require("util");
 const sendEmail = require("../utils/email");
+const { json } = require('express');
+
+
+
+const createSendToken=async (user,statusCode,res)=>{
+  const token=await signToken(user._id)
+  res.status(statusCode).json({
+    status:'success',
+    token,
+    data:{
+      user
+    }
+
+  })
+}
 
 const signToken = async (id) => {
   return jwt.sign({ id }, process.env.JWT_SECRET, {
@@ -14,15 +29,7 @@ const signToken = async (id) => {
 
 const signUp = catchAsync(async (req, res, next) => {
   const newUser = await User.create(req.body);
-  const token = await signToken(newUser._id);
-
-  res.status(201).json({
-    status: "success",
-    token,
-    data: {
-      user: newUser,
-    },
-  });
+  createSendToken(newUser,201,res)
 });
 const login = catchAsync(async (req, res, next) => {
   const { email, password } = req.body;
@@ -34,16 +41,8 @@ const login = catchAsync(async (req, res, next) => {
   if (!(await user.correctPassword(password, user.password)) || !user) {
     return next(new AppError("Incorrect email or password", 401));
   }
+  createSendToken(user,200,res)
 
-  const token = await signToken(user._id);
-
-  res.status(201).json({
-    status: "success",
-    token,
-    data: {
-      user,
-    },
-  });
 });
 
 const protect = catchAsync(async (req, res, next) => {
@@ -130,13 +129,25 @@ const resetPassword = catchAsync(async (req, res, next) => {
   user.passwordResetToken=undefined
   user.passwordResetExpires=undefined
   await user.save()
+  createSendToken(user,200,res)
 
-  const token=await signToken(user._id)
-  res.status(200).json({
-    status:'success',
-    token
-  })
 });
+
+
+const updatePassword= catchAsync(async (req, res, next) => {
+// 1) get the user from collection
+  const user =await User.findById(req.user.id).select('+password')
+
+// 2) check current password
+if(!(await user.correctPassword(req.body.currentPassword,user.password)))
+return next(new AppError('Your current password is wrongs',401))
+// 3) update then
+
+user.password=req.body.password
+user.confirmPassword=req.body.confirmPassword
+await user.save()
+// 4) send new jwt
+})
 module.exports = {
   signUp,
   login,
@@ -144,4 +155,5 @@ module.exports = {
   restrictTo,
   forgotPassword,
   resetPassword,
+  updatePassword
 };
